@@ -33,7 +33,7 @@ def bfs(start, end):
 
     # initialize
     ans = dict()
-    ans[start] = [0.0, 1]# the distance from start to start is 0
+    ans[start] = [0.0, -1]# the distance from start to start is 0
     nw = start
     q = queue.SimpleQueue()
     num_vised = 0
