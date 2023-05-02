@@ -79,7 +79,7 @@ class Net(nn.Module):
 
 
 class Agent():
-    def __init__(self, env, epsilon=0.95, learning_rate=0.0002, GAMMA=0.97, batch_size=32, capacity=10000):
+    def __init__(self, env, epsilon=0.05, learning_rate=0.0002, GAMMA=0.97, batch_size=32, capacity=10000):
         """
         The agent learning how to control the action of the cart pole.
         Hyperparameters:

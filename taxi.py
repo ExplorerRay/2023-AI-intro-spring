@@ -7,7 +7,7 @@ total_reward = []
 
 
 class Agent():
-    def __init__(self, env, epsilon=0.95, learning_rate=0.8, gamma=0.9):
+    def __init__(self, env, epsilon=0.05, learning_rate=0.8, gamma=0.9):
         """
         Parameters:
             env: target enviornment.

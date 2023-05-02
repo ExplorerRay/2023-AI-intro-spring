@@ -9,7 +9,7 @@ decay = 0.045
 
 
 class Agent():
-    def __init__(self, env, epsilon=0.95, learning_rate=0.5, GAMMA=0.97, num_bins=7):
+    def __init__(self, env, epsilon=0.05, learning_rate=0.5, GAMMA=0.97, num_bins=7):
         """
         The agent learning how to control the action of the cart pole.
         Hyperparameters:
