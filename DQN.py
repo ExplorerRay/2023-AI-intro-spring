@@ -131,8 +131,33 @@ class Agent():
             self.target_net.load_state_dict(self.evaluate_net.state_dict())
 
         # Begin your code
-        # TODO
-        raise NotImplementedError("Not implemented yet.")
+        # step 2
+        # return a tuple
+        for t in self.buffer.sample(self.batch_size):
+            print(t)
+            print(len(t))
+        buf_ob, buf_act, buf_rw, buf_nxob, buf_done = self.buffer.sample(self.batch_size)
+        # step 3
+        buf_ob = torch.tensor(np.array(buf_ob), dtype=torch.float)
+        buf_nxob = torch.tensor(np.array(buf_nxob), dtype=torch.float)
+        #q_eval = self.evaluate_net.forward(buf_ob)[0][buf_act]
+        q_eval = self.evaluate_net(buf_ob).gather(1, buf_act)
+        print('===')
+        print(q_eval)
+        print('===')
+        print('===')
+        print(buf_nxob)
+        print('===')
+        q_tar = buf_rw + self.gamma*self.target_net.forward(buf_nxob)
+        # step 4
+        loss_func = nn.MSELoss()
+        loss = loss_func(q_eval, q_tar)
+        # step 5
+        self.optimizer.zero_grad()
+        # step 6
+        loss.backward()
+        # step 7
+        self.optimizer.step()
         # End your code
         torch.save(self.target_net.state_dict(), "./Tables/DQN.pt")
 
@@ -150,8 +175,12 @@ class Agent():
         """
         with torch.no_grad():
             # Begin your code
-            # TODO
-            raise NotImplementedError("Not implemented yet.")
+            if abs(np.random.rand()) <= self.epsilon:
+                # get a random action
+                action = np.random.randint(0, self.n_actions)
+            else:
+                ac_vl = self.evaluate_net(torch.unsqueeze(torch.tensor(state, dtype=torch.float), 0))
+                action = torch.argmax(ac_vl).item()
             # End your code
         return action
 
@@ -167,8 +196,8 @@ class Agent():
             max_q: the max Q value of initial state(self.env.reset())
         """
         # Begin your code
-        # TODO
-        raise NotImplementedError("Not implemented yet.")
+        max_q = self.target_net.forward(self.env.reset())
+        return max_q
         # End your code
 
 

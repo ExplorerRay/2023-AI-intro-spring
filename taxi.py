@@ -38,8 +38,16 @@ class Agent():
             action: The action to be evaluated.
         """
         # Begin your code
-        # TODO
-        raise NotImplementedError("Not implemented yet.")
+        
+        # get a random unmber
+        rd = abs(np.random.rand())
+
+        if rd <= self.epsilon:
+            action = env.action_space.sample() # get a random action
+        else:
+            action = np.argmax(self.qtable[state])
+
+        return action
         # End your code
 
     def learn(self, state, action, reward, next_state, done):
@@ -57,8 +65,12 @@ class Agent():
             None (Don't need to return anything)
         """
         # Begin your code
-        # TODO
-        raise NotImplementedError("Not implemented yet.")
+        
+        q_now = self.qtable[state, action]
+
+        q_act_mx = np.max(self.qtable[next_state])
+
+        self.qtable[state, action] = (1 - self.learning_rate) * q_now + self.learning_rate * (reward + self.gamma * q_act_mx)
         # End your code
         np.save("./Tables/taxi_table.npy", self.qtable)
 
@@ -73,8 +85,8 @@ class Agent():
             max_q: the max Q value of given state
         """
         # Begin your code
-        # TODO
-        raise NotImplementedError("Not implemented yet.")
+        max_q = np.max(self.qtable[state])
+        return max_q
         # End your code
 
 
