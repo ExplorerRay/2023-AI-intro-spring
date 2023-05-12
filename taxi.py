@@ -65,12 +65,12 @@ class Agent():
             None (Don't need to return anything)
         """
         # Begin your code
-        
         q_now = self.qtable[state, action]
 
         q_act_mx = np.max(self.qtable[next_state])
 
-        self.qtable[state, action] = (1 - self.learning_rate) * q_now + self.learning_rate * (reward + self.gamma * q_act_mx)
+        self.qtable[state, action] = (1 - self.learning_rate) * q_now + \
+                self.learning_rate * (reward + self.gamma * q_act_mx)
         # End your code
         np.save("./Tables/taxi_table.npy", self.qtable)
 

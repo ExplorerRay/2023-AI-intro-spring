@@ -133,25 +133,23 @@ class Agent():
         # Begin your code
         # step 2
         # return a tuple
-        for t in self.buffer.sample(self.batch_size):
-            print(t)
-            print(len(t))
         buf_ob, buf_act, buf_rw, buf_nxob, buf_done = self.buffer.sample(self.batch_size)
         # step 3
         buf_ob = torch.tensor(np.array(buf_ob), dtype=torch.float)
+        buf_act = torch.tensor(np.array(buf_act), dtype=torch.long).unsqueeze(1)
+        buf_rw = torch.tensor(np.array(buf_rw), dtype=torch.float)
         buf_nxob = torch.tensor(np.array(buf_nxob), dtype=torch.float)
-        #q_eval = self.evaluate_net.forward(buf_ob)[0][buf_act]
-        q_eval = self.evaluate_net(buf_ob).gather(1, buf_act)
-        print('===')
-        print(q_eval)
-        print('===')
-        print('===')
-        print(buf_nxob)
-        print('===')
-        q_tar = buf_rw + self.gamma*self.target_net.forward(buf_nxob)
+        # forward() return 32*2 tensor (32 is batch size)
+        q_eval = self.evaluate_net.forward(buf_ob).gather(1, buf_act)
+
+        q_nx = self.target_net.forward(buf_nxob).detach().max(1)[0]
+        for l in range(self.batch_size):
+            if(buf_done[l]==1):
+                q_nx[l] = 0
+        q_tar = buf_rw + self.gamma*q_nx
         # step 4
         loss_func = nn.MSELoss()
-        loss = loss_func(q_eval, q_tar)
+        loss = loss_func(q_eval, q_tar.unsqueeze(1))
         # step 5
         self.optimizer.zero_grad()
         # step 6
@@ -175,11 +173,13 @@ class Agent():
         """
         with torch.no_grad():
             # Begin your code
-            if abs(np.random.rand()) <= self.epsilon:
+            if abs(np.random.random()) <= self.epsilon:
                 # get a random action
-                action = np.random.randint(0, self.n_actions)
+                action = env.action_space.sample()
             else:
-                ac_vl = self.evaluate_net(torch.unsqueeze(torch.tensor(state, dtype=torch.float), 0))
+                ac_vl = self.evaluate_net.forward(
+                    torch.tensor(state, dtype=torch.float))
+                # ac_vl is the tensor with 2 Q values of two actions
                 action = torch.argmax(ac_vl).item()
             # End your code
         return action
@@ -196,7 +196,8 @@ class Agent():
             max_q: the max Q value of initial state(self.env.reset())
         """
         # Begin your code
-        max_q = self.target_net.forward(self.env.reset())
+        max_q = self.target_net.forward(
+            torch.tensor(self.env.reset(), dtype=torch.float)).detach().max()
         return max_q
         # End your code
 

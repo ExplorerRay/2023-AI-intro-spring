@@ -139,7 +139,8 @@ class Agent():
 
         q_act_mx = np.max(self.qtable[tuple(next_state)])
 
-        self.qtable[tuple(state)][action] = (1 - self.learning_rate) * q_now + self.learning_rate * (reward + self.gamma * q_act_mx)
+        self.qtable[tuple(state)][action] = (1 - self.learning_rate) * q_now +\
+                self.learning_rate * (reward + self.gamma * q_act_mx)
         # End your code
         np.save("./Tables/cartpole_table.npy", self.qtable)
 
